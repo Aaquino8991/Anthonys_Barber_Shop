@@ -8,10 +8,18 @@ from faker import Faker
 
 # Local imports
 from app import app
-from models import db
+from models import db, Barber, Client, Appointment
 
-if __name__ == '__main__':
-    fake = Faker()
-    with app.app_context():
-        print("Starting seed...")
-        # Seed code goes here!
+# if __name__ == '__main__':
+#     fake = Faker()
+#     with app.app_context():
+#         print("Starting seed...")
+#         # Seed code goes here!
+with app.app_context():
+
+    print("Deleting all records...")
+    Barber.query.delete()
+    Client.query.delete()
+
+    db.session.commit()
+    print("Done")
