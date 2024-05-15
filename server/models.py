@@ -13,7 +13,7 @@ class Barber(db.Model, SerializerMixin):
 
     reviews = db.relationship('Review', back_populates = 'barber', cascade = 'all, delete-orphan')
 
-    serialize_rules = ('-reviews.barber')
+    serialize_rules = ('-reviews.barber',)
 
     def __repr__(self):
         return f'<Barber: {self.id}>'
@@ -30,7 +30,7 @@ class Client(db.Model, SerializerMixin):
 
     reviews = db.relationship('Review', back_populates = 'client', cascade = 'all, delete-orphan')
 
-    serialize_rules = ('-reviews.client')
+    serialize_rules = ('-reviews.client',)
 
     def __repr__(self):
         return f'<Client: {self.id}>'
