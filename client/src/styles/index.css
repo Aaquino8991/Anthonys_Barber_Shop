@@ -86,3 +86,16 @@ nav {
     align-items: center;
     justify-content: center;
   }
+
+  /* ----------ClientReviewPage---------- */
+
+  .review-card {
+    margin: 10px; 
+    padding: 10px
+  }
+
+  .review-card:hover {
+    box-shadow: 1px 1px 5px;
+  }
+
+  

@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy_serializer import SerializerMixin
 
 from config import app, db, api, bcrypt
-from datetime import datetime, timezone
+from datetime import datetime
 
 from models import Barber, Client, Review
 
@@ -120,12 +120,42 @@ class Reviews(Resource):
 
         return review_dict, 200
     
+class ReviewsById(Resource):
+
+    def patch(self, id):
+        review = Review.query.filter(Review.review_id == id).first()
+        if not review:
+            return {"error": "Review not found"}, 404
+
+        for attr in request.json:
+            setattr(review, attr, request.json[attr])
+
+        try:
+            db.session.commit()
+            return review.to_dict(), 200
+        except Exception as e:
+            db.session.rollback()
+            return {"error": str(e)}, 500
+
+    def delete(self, id):
+        review = Review.query.filter_by(review_id=id).first()
+        if not review:
+            return {"error": "Review not found"}, 404
+
+        try:
+            db.session.delete(review)
+            db.session.commit()
+            return {"message": "Review successfully deleted"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"error": str(e)}, 500
+    
 class ReviewsIndex(Resource):
 
     def get(self):
 
-        # if 'client_id' not in session:
-        #     return {"error": "Client not logged in"}, 401
+        if 'client_id' not in session:
+            return {"error": "Client not logged in"}, 401
         
         client_session = session.get('client_id')
         client = Client.query.filter(Client.id == client_session).first()
@@ -134,7 +164,6 @@ class ReviewsIndex(Resource):
             return {"error": "Client not found"}, 404
         else:
             reviews = [review.to_dict() for review in client.reviews]
-            print(f"fetched reviews: {reviews}")
             return reviews, 200
 
     def post(self):
@@ -146,22 +175,20 @@ class ReviewsIndex(Resource):
         title = request_json.get('title')
         rating = request_json.get('rating')
         comments = request_json.get('comments')
-        date_posted = request_json.get('date_posted')
         barber_id = request_json.get('barber_id')
-
+        
         if not barber_id:
             return {"error": "Barber not selected"}, 400
 
         try:
             new_review = Review(
                 title=title,
-                rating=rating,
+                rating=int(rating),
                 comments=comments,
-                date_posted=datetime.fromisoformat(date_posted),
+                date_posted=datetime.now(),
                 client_id=session['client_id'],
                 barber_id=barber_id
             )
-            print(new_review)
             db.session.add(new_review)
             db.session.commit()
 
@@ -174,30 +201,6 @@ class ReviewsIndex(Resource):
             db.session.rollback()
             return {"error": str(e)}, 500
         
-    def delete(self):
-        if 'client_id' not in session:
-            return {"error": "Client not logged in"}, 401
-
-        client_id = session['client_id']
-        review_id = request.get_json().get('review_id')
-
-        review = Review.query.filter_by(id=review_id).first()
-
-        if not review:
-            return {"error": "Review not found"}, 404
-
-        if review.client_id != client_id:
-            return {"error": "You do not have permission to delete this review"}, 403
-
-        try:
-            db.session.delete(review)
-            db.session.commit()
-            return {"message": "Review deleted successfully"}, 200
-
-        except Exception as e:
-            db.session.rollback()
-            return {"error": str(e)}, 500
-
 
 api.add_resource(Signup, '/signup', endpoint='signup')
 api.add_resource(CheckSession, '/check_session', endpoint='check_session')
@@ -206,6 +209,7 @@ api.add_resource(Logout, '/logout', endpoint='logout')
 api.add_resource(Clients, '/clients', endpoint='clients')
 api.add_resource(Barbers, '/barbers', endpoint='barbers')
 api.add_resource(Reviews, '/reviews', endpoint='reviews')
+api.add_resource(ReviewsById, '/reviews/<int:id>', endpoint='reviews/<int:id>')
 api.add_resource(ReviewsIndex, '/reviews_index', endpoint='reviews_index')
 
 if __name__ == '__main__':
