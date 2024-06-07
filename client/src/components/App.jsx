@@ -4,6 +4,10 @@ import NavBar from "./NavBar"
 import Login from "../pages/Login"
 import ReviewPage from "../pages/ClientReviewPage"
 import NewReview from "../pages/NewReview"
+import NotFoundPage from '../pages/NotFoundPage'
+import EditReviewPage from "../pages/EditReviewPage"
+import BarberPage from "../pages/BarberPage"
+import BarberForm from "./BarberForm"
 
 const App = () => {
   const [client, setClient] = useState(null)
@@ -31,6 +35,10 @@ const App = () => {
         ) : (
           <Route path="/*" element={<Login onLogin={setClient} />} />
         )}
+        <Route path="/edit-review/:id" element={<EditReviewPage />} />
+        <Route path="/barbers" element={<BarberPage />} />
+        <Route path="/create-barber" element={<BarberForm />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   )

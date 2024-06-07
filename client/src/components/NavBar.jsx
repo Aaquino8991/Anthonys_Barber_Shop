@@ -19,10 +19,18 @@ const NavBar = ({ client, setClient }) => {
         <li>
           <Link to="/">Home</Link>
         </li>
+        <li>
+          <Link to="/barbers">Barbers</Link>
+        </li>
         {client ? (
-          <li>
-            <Link to="/login" onClick={handleLogoutClick}>Logout</Link>
-          </li>
+          <>
+            <li>
+              <Link to='/new_review'>Add Review</Link>
+            </li>
+            <li>
+              <Link to="/login" onClick={handleLogoutClick}>Logout</Link>
+            </li>
+          </>
         ) : (
           <li>
             <Link to="/login">Login</Link>

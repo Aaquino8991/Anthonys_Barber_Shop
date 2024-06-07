@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 const NewReview = () => {
+  const navigate = useNavigate()
   const [title, setTitle] = useState("")
   const [rating, setRating] = useState("")
   const [comments, setComments] = useState("")
@@ -39,6 +41,8 @@ const NewReview = () => {
       if (res.ok) {
         res.json().then((newReview) => {
           console.log("Review submitted successfully:", newReview)
+          const nav = () => navigate('/')
+          nav()
         })
       } else {
         res.json().then((err) => setErrors(err.errors))
@@ -47,41 +51,46 @@ const NewReview = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="title">Title:</label>
-      <input
-        type="text"
-        id="title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
+    <>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="title">Title:</label>
+        <input
+          type="text"
+          id="title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
 
-      <label htmlFor="rating">Rating:</label>
-      <input
-        type="number"
-        id="rating"
-        value={rating}
-        onChange={(e) => setRating(e.target.value)}
-      />
+        <label htmlFor="rating">Rating:</label>
+        <input
+          type="number"
+          id="rating"
+          value={rating}
+          onChange={(e) => setRating(e.target.value)}
+        />
 
-      <label htmlFor="comments">Comments:</label>
-      <textarea
-        id="comments"
-        value={comments}
-        onChange={(e) => setComments(e.target.value)}
-      />
+        <label htmlFor="comments">Comments:</label>
+        <textarea
+          id="comments"
+          value={comments}
+          onChange={(e) => setComments(e.target.value)}
+        />
 
-      <label htmlFor="barber">Barber:</label>
-      <select id="barber" value={barberId} onChange={(e) => setBarberId(e.target.value)}>
-        <option value="">Select a barber</option>
-        {barbers.map((barber) => (
-          <option key={barber.id} value={barber.id}>{barber.name}</option>
-        ))}
-      </select>
+        <label htmlFor="barber">Barber:</label>
+        <select id="barber" value={barberId} onChange={(e) => setBarberId(e.target.value)}>
+          <option value="">Select a barber</option>
+          {barbers.map((barber) => (
+            <option key={barber.id} value={barber.id}>{barber.name}</option>
+          ))}
+        </select>
 
-      <button type="submit">{isLoading ? "Loading..." : "Submit Review"}</button>
-      {errors && <p>{errors}</p>}
-    </form>
+        <button type="submit">{isLoading ? "Loading..." : "Submit Review"}</button>
+        {errors && <p>{errors}</p>}
+      </form>
+      <div className="cancel-btn">        
+        <button onClick={() => navigate('/')}>Cancel</button>
+      </div>
+    </>
   )
 }
 

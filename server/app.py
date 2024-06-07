@@ -68,9 +68,12 @@ class Login(Resource):
         password = form_data.get('password')
 
         client = Client.query.filter_by(email=email).first()
+        print(client)
 
         if client and client.authenticate(password):
             session['client_id'] = client.id
+            print(session['client_id'])
+            print(client.id)
 
             return client.to_dict(), 200
         
@@ -91,9 +94,11 @@ class Clients(Resource):
 
     def get(self):
 
-        client_dict = [client.to_dict(rules=('-reviews.barber',)) for client in Client.query.all()]
-        
-        return client_dict, 200
+        if session.get('client_id'):
+            id = session.get('client_id')
+            client = Client.query.filter_by(id=id).first()
+
+            return client.to_dict(), 200
     
 class Barbers(Resource):
 
@@ -103,13 +108,22 @@ class Barbers(Resource):
         
         return barber_dict, 200
     
-class BarberById(Resource):
+    def post(self):
 
-    def get(self, id):
+        data_request = request.get_json()
 
-        barber = Barber.query.filter_by(id=id).first()
+        name = data_request.get('name')
+        email = data_request.get('email')
 
-        return barber.to_dict(), 200
+        new_barber = Barber(
+            name=name,
+            email=email
+        )
+
+        db.session.add(new_barber)
+        db.session.commit()
+
+        return new_barber.to_dict(), 201
     
 class Reviews(Resource):
     
@@ -122,8 +136,16 @@ class Reviews(Resource):
     
 class ReviewsById(Resource):
 
+    def get(self, id):
+
+        review = Review.query.filter_by(review_id=id).first()
+
+        return review.to_dict(), 200
+        
+
     def patch(self, id):
         review = Review.query.filter(Review.review_id == id).first()
+        
         if not review:
             return {"error": "Review not found"}, 404
 
@@ -131,6 +153,7 @@ class ReviewsById(Resource):
             setattr(review, attr, request.json[attr])
 
         try:
+            db.session.add(review)
             db.session.commit()
             return review.to_dict(), 200
         except Exception as e:
@@ -209,8 +232,8 @@ api.add_resource(Logout, '/logout', endpoint='logout')
 api.add_resource(Clients, '/clients', endpoint='clients')
 api.add_resource(Barbers, '/barbers', endpoint='barbers')
 api.add_resource(Reviews, '/reviews', endpoint='reviews')
-api.add_resource(ReviewsById, '/reviews/<int:id>', endpoint='reviews/<int:id>')
+api.add_resource(ReviewsById, '/reviews/<int:id>')
 api.add_resource(ReviewsIndex, '/reviews_index', endpoint='reviews_index')
 
 if __name__ == '__main__':
-    app.run(port=5555, debug=True)
+    app.run(port=5000, debug=True)
