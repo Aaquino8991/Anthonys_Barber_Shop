@@ -23,7 +23,6 @@ const SignupForm = ({ onLogin }) => {
             .string()
             .required("Re-enter password")
             .oneOf([yup.ref('password'), null], "Passwords must match")
-        
     })
 
     const formik = useFormik({
@@ -42,7 +41,7 @@ const SignupForm = ({ onLogin }) => {
     const navigate = useNavigate()
 
     function handleSubmit(values) {
-        setServerErrors(null);
+        setServerErrors([]);
         setIsLoading(true);
         fetch("/api/signup", {
             method: "POST",
@@ -62,10 +61,7 @@ const SignupForm = ({ onLogin }) => {
                     setServerErrors(error["error:"]);
                 });
             }
-        }).catch(() => {
-            setIsLoading(false);
-            setServerErrors("An unexpected error occurred.");
-        });
+        })
     }
 
   return (

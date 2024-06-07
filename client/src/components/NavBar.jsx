@@ -19,9 +19,6 @@ const NavBar = ({ client, setClient }) => {
         <li>
           <Link to="/">Home</Link>
         </li>
-        <li>
-          <Link to="/barbers">Barbers</Link>
-        </li>
         {client ? (
           <>
             <li>
@@ -32,9 +29,14 @@ const NavBar = ({ client, setClient }) => {
             </li>
           </>
         ) : (
-          <li>
-            <Link to="/login">Login</Link>
-          </li>
+          <>
+            <li>
+              <Link to="/barbers">Barbers</Link>
+            </li>
+            <li>
+              <Link to="/login">Login</Link>
+            </li>
+          </>
         )}
       </ul>
     </nav>

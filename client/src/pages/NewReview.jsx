@@ -1,14 +1,32 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useFormik } from "formik"
+import * as yup from "yup"
+import { GiConsoleController } from "react-icons/gi"
 
 const NewReview = () => {
+
+  const formSchema = yup.object().shape({
+    title: yup
+      .string()
+      .required("Please enter a title")
+      .max(25, "Max: 25 characters"),
+    rating: yup
+      .number()
+      .required("Please enter a rating")
+      .min(1, "Min: 1")
+      .max(5, "Max: 5"),
+    comments: yup
+      .string()
+      .max(120, "Max: 120 characters"),
+    barberId: yup
+      .string()
+      .required("Please select a barber")
+  })
+
   const navigate = useNavigate()
-  const [title, setTitle] = useState("")
-  const [rating, setRating] = useState("")
-  const [comments, setComments] = useState("")
-  const [barberId, setBarberId] = useState("")
   const [barbers, setBarbers] = useState([])
-  const [errors, setErrors] = useState([])
+  const [serverErrors, setServerErrors] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
@@ -18,79 +36,98 @@ const NewReview = () => {
       .catch((error) => console.error("Error fetching barbers:", error))
   }, [])
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setIsLoading(true)
+  const formik = useFormik({
+    initialValues: {
+      title: "",
+      rating: "",
+      comments: "",
+      barberId: "",
+    },
+    validationSchema: formSchema,
+    onSubmit: (values) => {
+      setServerErrors([])
+      setIsLoading(true)
 
-    const date_posted = new Date().toISOString()
+      console.log(formik.barberId)
 
-    fetch("/api/reviews_index", {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title,
-        rating,
-        comments,
-        date_posted,
-        barber_id: barberId
-      }),
-    }).then((res) => {
-      setIsLoading(false)
-      if (res.ok) {
-        res.json().then((newReview) => {
-          console.log("Review submitted successfully:", newReview)
-          const nav = () => navigate('/')
-          nav()
-        })
-      } else {
-        res.json().then((err) => setErrors(err.errors))
-      }
-    })
-  }
+      const date_posted = new Date().toISOString()
+
+      fetch("/api/reviews_index", {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...values,
+          date_posted
+        }),
+      }).then((res) => {
+        setIsLoading(false)
+        if (res.ok) {
+          res.json().then((newReview) => {
+            console.log("Review submitted successfully:", newReview)
+            navigate('/')
+          })
+        } else {
+          res.json().then((err) => setServerErrors(err))
+        }
+      })
+    },
+  })
 
   return (
-    <>
-      <form onSubmit={handleSubmit}>
+    <div>
+      <form onSubmit={formik.handleSubmit}>
         <label htmlFor="title">Title:</label>
         <input
           type="text"
           id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          name="title"
+          value={formik.values.title}
+          onChange={formik.handleChange}
         />
+        {formik.touched.title && formik.errors.title ? <p style={{ color: 'red' }}>{formik.errors.title}</p> : null}
 
         <label htmlFor="rating">Rating:</label>
         <input
           type="number"
           id="rating"
-          value={rating}
-          onChange={(e) => setRating(e.target.value)}
+          name="rating"
+          value={formik.values.rating}
+          onChange={formik.handleChange}
         />
+        {formik.touched.rating && formik.errors.rating ? <p style={{ color: 'red' }}>{formik.errors.rating}</p> : null}
 
         <label htmlFor="comments">Comments:</label>
         <textarea
           id="comments"
-          value={comments}
-          onChange={(e) => setComments(e.target.value)}
+          name="comments"
+          value={formik.values.comments}
+          onChange={formik.handleChange}
         />
+        {formik.touched.comments && formik.errors.comments ? <p style={{ color: 'red' }}>{formik.errors.comments}</p> : null}
 
         <label htmlFor="barber">Barber:</label>
-        <select id="barber" value={barberId} onChange={(e) => setBarberId(e.target.value)}>
+        <select 
+          id="barberId" 
+          name="barberId" 
+          value={formik.values.barberId} 
+          onChange={formik.handleChange}
+        >
           <option value="">Select a barber</option>
           {barbers.map((barber) => (
             <option key={barber.id} value={barber.id}>{barber.name}</option>
           ))}
         </select>
+        {formik.touched.barberId && formik.errors.barberId ? <p style={{ color: 'red' }}>{formik.errors.barberId}</p> : null}
 
         <button type="submit">{isLoading ? "Loading..." : "Submit Review"}</button>
-        {errors && <p>{errors}</p>}
+        {serverErrors && <p style={{ color: 'red' }}>{serverErrors.error}</p>}
       </form>
       <div className="cancel-btn">        
         <button onClick={() => navigate('/')}>Cancel</button>
       </div>
-    </>
+    </div>
   )
 }
 

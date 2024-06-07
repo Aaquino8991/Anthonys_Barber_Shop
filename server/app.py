@@ -72,8 +72,6 @@ class Login(Resource):
 
         if client and client.authenticate(password):
             session['client_id'] = client.id
-            print(session['client_id'])
-            print(client.id)
 
             return client.to_dict(), 200
         
@@ -198,7 +196,7 @@ class ReviewsIndex(Resource):
         title = request_json.get('title')
         rating = request_json.get('rating')
         comments = request_json.get('comments')
-        barber_id = request_json.get('barber_id')
+        barber_id = request_json.get('barberId')
         
         if not barber_id:
             return {"error": "Barber not selected"}, 400
