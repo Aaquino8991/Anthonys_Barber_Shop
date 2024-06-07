@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import * as yup from "yup"
 import { useFormik } from 'formik'
 
@@ -38,10 +39,11 @@ const SignupForm = ({ onLogin }) => {
 
     const [serverErrors, setServerErrors] = useState([])
     const [isLoading, setIsLoading] = useState(false)
+    const navigate = useNavigate()
 
     function handleSubmit(values) {
-        setServerErrors([])
-        setIsLoading(true)
+        setServerErrors(null);
+        setIsLoading(true);
         fetch("/api/signup", {
             method: "POST",
             headers: {
@@ -50,13 +52,20 @@ const SignupForm = ({ onLogin }) => {
             },
             body: JSON.stringify(values, null, 2)
         }).then((res) => {
-            setIsLoading(false)
-            if(res.ok) {
-                res.json().then((client) => onLogin(client))
+            setIsLoading(false);
+            if (res.ok) {
+                res.json().then((client) => onLogin(client));
+                const nav = navigate('/')
+                nav()
             } else {
-                res.json().then((error) => setServerErrors(error))
+                res.json().then((error) => {
+                    setServerErrors(error["error:"]);
+                });
             }
-        })
+        }).catch(() => {
+            setIsLoading(false);
+            setServerErrors("An unexpected error occurred.");
+        });
     }
 
   return (
@@ -98,7 +107,7 @@ const SignupForm = ({ onLogin }) => {
         <p style={{ color: 'red' }}>{formik.errors.confirmPassword}</p>
 
         <button type="submit">{isLoading ? "Loading..." : "Sign up"}</button>
-        <p style={{ color: 'red' }}>{serverErrors.error}</p>
+        {serverErrors && <p style={{ color: 'red' }}>{serverErrors}</p>}
     </form>
   )
 }

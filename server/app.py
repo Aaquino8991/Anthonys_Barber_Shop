@@ -5,7 +5,7 @@ from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy_serializer import SerializerMixin
 
-from config import app, db, api, bcrypt
+from config import app, db, api
 from datetime import datetime
 
 from models import Barber, Client, Review
