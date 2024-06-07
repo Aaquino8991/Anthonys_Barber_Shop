@@ -85,6 +85,7 @@ const NewReview = () => {
           name="title"
           value={formik.values.title}
           onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
         />
         {formik.touched.title && formik.errors.title ? <p style={{ color: 'red' }}>{formik.errors.title}</p> : null}
 
@@ -95,6 +96,7 @@ const NewReview = () => {
           name="rating"
           value={formik.values.rating}
           onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
         />
         {formik.touched.rating && formik.errors.rating ? <p style={{ color: 'red' }}>{formik.errors.rating}</p> : null}
 
@@ -104,6 +106,7 @@ const NewReview = () => {
           name="comments"
           value={formik.values.comments}
           onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
         />
         {formik.touched.comments && formik.errors.comments ? <p style={{ color: 'red' }}>{formik.errors.comments}</p> : null}
 
@@ -113,6 +116,7 @@ const NewReview = () => {
           name="barberId" 
           value={formik.values.barberId} 
           onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
         >
           <option value="">Select a barber</option>
           {barbers.map((barber) => (
