@@ -56,7 +56,7 @@ class CheckSession(Resource, SerializerMixin):
             client = Client.query.filter_by(id=id).first()
             return client.to_dict(), 200
         else:
-            return {}, 200
+            return {}, 401
     
 class Login(Resource):
     

@@ -12,6 +12,8 @@ import BarberForm from "./BarberForm"
 const App = () => {
   const [client, setClient] = useState(null)
 
+  console.log(client)
+
   useEffect(() => {
     fetch('/api/check_session')
       .then((res) => {

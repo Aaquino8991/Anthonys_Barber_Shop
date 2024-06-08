@@ -44,7 +44,7 @@ const BarberForm = () => {
                 navigate('/barbers');
             } else {
                 res.json().then((error) => {
-                    setServerErrors(error["error:"] || error.message || "An error occurred.");
+                    setServerErrors(error["error:"]);
                 });
             }
         }).catch(() => {

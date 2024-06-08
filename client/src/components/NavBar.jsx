@@ -2,6 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const NavBar = ({ client, setClient }) => {
+
+  console.log(client)
+
   const handleLogoutClick = () => {
     fetch('/api/logout', {
       method: 'DELETE',
