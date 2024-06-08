@@ -110,18 +110,27 @@ class Barbers(Resource):
 
         data_request = request.get_json()
 
-        name = data_request.get('name')
-        email = data_request.get('email')
+        try:
+            name = data_request.get('name')
+            email = data_request.get('email')
 
-        new_barber = Barber(
-            name=name,
-            email=email
-        )
+            new_barber = Barber(
+                name=name,
+                email=email
+            )
 
-        db.session.add(new_barber)
-        db.session.commit()
+            db.session.add(new_barber)
+            db.session.commit()
 
-        return new_barber.to_dict(), 201
+            return new_barber.to_dict(), 201
+        
+        except IntegrityError:
+            db.session.rollback()
+            return {"error:": "Email already exists"}, 422
+        
+        except Exception as e:
+            db.session.rollback()
+            return {"error": str(e)}, 422
     
 class Reviews(Resource):
     
