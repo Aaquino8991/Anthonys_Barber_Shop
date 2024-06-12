@@ -8,10 +8,18 @@ from sqlalchemy_serializer import SerializerMixin
 from config import app, db, api
 from datetime import datetime
 
-from models import Barber, Client, Review
+from models import Barber, Client, Review, Appointment
 
 
 class Signup(Resource):
+
+    def get(self):
+
+        clients = Client.query.all()
+
+        client_dict = [client.to_dict() for client in clients]
+
+        return client_dict, 200
 
     def post(self):
         form_data = request.get_json()
@@ -44,7 +52,7 @@ class Signup(Resource):
         
         except Exception as e:
             db.session.rollback()
-            return {"error": str(e)}, 422
+            return {"error": str(e)}, 500
         
 class CheckSession(Resource, SerializerMixin):
 
@@ -231,6 +239,14 @@ class ReviewsIndex(Resource):
             db.session.rollback()
             return {"error": str(e)}, 500
         
+class Appointments(Resource):
+    def get(self):
+
+        appointments = Appointment.query.all()
+        appointment_dict = [appointment.to_dict(rules=('-barber', '-reviews', '-client')) for appointment in appointments]
+
+        return appointment_dict, 200
+        
 
 api.add_resource(Signup, '/signup', endpoint='signup')
 api.add_resource(CheckSession, '/check_session', endpoint='check_session')
@@ -241,6 +257,7 @@ api.add_resource(Barbers, '/barbers', endpoint='barbers')
 api.add_resource(Reviews, '/reviews', endpoint='reviews')
 api.add_resource(ReviewsById, '/reviews/<int:id>')
 api.add_resource(ReviewsIndex, '/reviews_index', endpoint='reviews_index')
+api.add_resource(Appointments, '/appointments', endpoint='appointments')
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

@@ -14,8 +14,9 @@ class Barber(db.Model, SerializerMixin):
     email = db.Column(db.String, unique=True)
 
     reviews = db.relationship('Review', back_populates = 'barber', cascade = 'all, delete-orphan')
+    appointments = db.relationship('Appointment', back_populates = 'barber', cascade = 'all, delete-orphan')
 
-    serialize_rules = ('-reviews.barber',)
+    serialize_rules = ('-reviews.barber', '-appointments.barber')
 
     @validates('name')
     def validates_name(self, key, name):
@@ -44,8 +45,9 @@ class Client(db.Model, SerializerMixin):
     email = db.Column(db.String, unique=True)
 
     reviews = db.relationship('Review', back_populates = 'client', cascade = 'all, delete-orphan')
+    appointments = db.relationship('Appointment', back_populates = 'client', cascade = 'all, delete-orphan')
 
-    serialize_rules = ('-reviews.client',)
+    serialize_rules = ('-reviews.client', '-reviews.appointment')
 
     @validates('name')
     def validates_name(self, key, name):
@@ -117,3 +119,22 @@ class Review(db.Model, SerializerMixin):
 
     def __repr__(self):
         return f'<Review: {self.review_id}>'
+    
+class Appointment(db.Model, SerializerMixin):
+        __tablename__ = 'appointments'
+
+        id = db.Column(db.Integer, primary_key=True)
+        appointment_date = db.Column(db.String, nullable=False)
+        appointment_time = db.Column(db.String, nullable=False)
+        service_type = db.Column(db.String(200))
+
+        barber_id = db.Column(db.Integer, db.ForeignKey('barbers.id'))
+        client_id = db.Column(db.Integer, db.ForeignKey('clients.id'))
+
+        barber = db.relationship('Barber', back_populates = 'appointments')
+        client = db.relationship('Client', back_populates = 'appointments')
+
+        serialize_rules = ('-barber.appointments', '-client.appointments')
+
+        def __repr__(self):
+            return f'<Appointment: {self.id} | {self.service_type}'

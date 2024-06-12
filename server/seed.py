@@ -3,13 +3,14 @@
 # Standard library imports
 from random import randint, choice as rc
 from datetime import datetime, timedelta
+import random
 
 # Remote library imports
 from faker import Faker
 
 # Local imports
 from app import app
-from models import db, Barber, Client, Review
+from models import db, Barber, Client, Review, Appointment
 
 fake = Faker()
 
@@ -64,6 +65,21 @@ def create_reviews(barbers, clients):
     
     return reviews
 
+def create_appointments(barbers, clients):
+    appointments = []
+    services = ['Haircut', 'Shave', 'Hair Color', 'Beard Trim', 'Facial']
+    for n in range(10):
+        new_appointment = Appointment(
+            appointment_date=fake.future_date(),
+            appointment_time=fake.time(pattern='%H:%M:%S'),
+            service_type=random.choice(services),
+            barber_id=rc([barber.id for barber in barbers]),
+            client_id=rc([client.id for client in clients])
+        )
+        appointments.append(new_appointment)
+
+    return appointments
+
 
 
 if __name__ == '__main__':
@@ -87,6 +103,11 @@ if __name__ == '__main__':
         print('Seeding reviews...')
         reviews = create_reviews(barbers, clients)
         db.session.add_all(reviews)
+        db.session.commit()
+
+        print('Seeding appointments...')
+        appointments = create_appointments(barbers, clients)
+        db.session.add_all(appointments)
         db.session.commit()
 
         print("Done!")
