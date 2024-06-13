@@ -27,7 +27,7 @@ def create_barbers():
     for n in range(5):
         new_barber = Barber(
             name = fake.first_name(),
-            email = fake.email()
+            email = fake.email(),
         )
         barbers.append(new_barber)
 
@@ -67,12 +67,10 @@ def create_reviews(barbers, clients):
 
 def create_appointments(barbers, clients):
     appointments = []
-    services = ['Haircut', 'Shave', 'Hair Color', 'Beard Trim', 'Facial']
     for n in range(10):
         new_appointment = Appointment(
-            appointment_date=fake.future_date(),
-            appointment_time=fake.time(pattern='%H:%M:%S'),
-            service_type=random.choice(services),
+            date=fake.future_date(),
+            time=fake.time(pattern='%H:%M:%S'),
             barber_id=rc([barber.id for barber in barbers]),
             client_id=rc([client.id for client in clients])
         )

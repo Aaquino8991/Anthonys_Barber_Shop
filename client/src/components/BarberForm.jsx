@@ -54,33 +54,56 @@ const BarberForm = () => {
     }
 
     return (
-        <div>
-            <form onSubmit={formik.handleSubmit}>
-                <label htmlFor="name">Name:</label>
+        <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md">
+            <form onSubmit={formik.handleSubmit} className="space-y-4">
+                <div>
+                <label htmlFor="name" className="block text-gray-700">Name:</label>
                 <input 
                     type="text"
                     id="name"
                     value={formik.values.name}
                     onChange={formik.handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
-                <p style={{ color: 'red' }}>{formik.errors.name}</p>
-
-                <label htmlFor="email">Email:</label>
+                {formik.errors.name && (
+                    <p className="text-red-500">{formik.errors.name}</p>
+                )}
+                </div>
+                <div>
+                <label htmlFor="email" className="block text-gray-700">Email:</label>
                 <input 
                     type="text"
                     id="email"
                     value={formik.values.email}
                     onChange={formik.handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
-                <p style={{ color: 'red' }}>{formik.errors.email}</p>
-
-                <button type="submit">{isLoading ? "Loading..." : "Create Barber"}</button>
-                {serverErrors && <p style={{ color: 'red' }}>{serverErrors}</p>}
+                {formik.errors.email && (
+                    <p className="text-red-500">{formik.errors.email}</p>
+                )}
+                </div>
+                <div className="flex space-x-4">
+                <button 
+                    type="submit" 
+                    className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition duration-200"
+                >
+                    {isLoading ? "Loading..." : "Create Barber"}
+                </button>
+                {serverErrors && (
+                    <p className="text-red-500">{serverErrors}</p>
+                )}
+                </div>
+                <div className="mt-4">
+                    <button 
+                    onClick={() => navigate('/barbers')} 
+                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition duration-200"
+                    >
+                    Cancel
+                    </button>
+                </div>
             </form>
-            <div className="cancel-btn">
-                <button onClick={() => navigate('/barbers')}>Cancel</button>
-            </div>
         </div>
+
     );
 };
 

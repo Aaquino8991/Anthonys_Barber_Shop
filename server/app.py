@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from flask import request, session
+from flask import request, session, jsonify
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy_serializer import SerializerMixin
@@ -16,8 +16,7 @@ class Signup(Resource):
     def get(self):
 
         clients = Client.query.all()
-
-        client_dict = [client.to_dict() for client in clients]
+        client_dict = [client.to_dict(rules=('-appointments.barber', '-appointments.client')) for client in clients]
 
         return client_dict, 200
 
@@ -104,7 +103,7 @@ class Clients(Resource):
             id = session.get('client_id')
             client = Client.query.filter_by(id=id).first()
 
-            return client.to_dict(), 200
+            return client.to_dict(rules=('-_password_hash',)), 200
     
 class Barbers(Resource):
 
@@ -240,12 +239,100 @@ class ReviewsIndex(Resource):
             return {"error": str(e)}, 500
         
 class Appointments(Resource):
+   
+   def get(self):
+       
+       appointments = Appointment.query.all()
+       appt_dict = [appointment.to_dict() for appointment in appointments]
+
+       return appt_dict, 200
+   
+class AppointmentsByClient(Resource):
+
     def get(self):
 
-        appointments = Appointment.query.all()
-        appointment_dict = [appointment.to_dict(rules=('-barber', '-reviews', '-client')) for appointment in appointments]
+        if 'client_id' not in session:
+            return {"error": "Must be logged in to view"}, 401
+        
+        client_session = session.get('client_id')
+        client = Client.query.filter(Client.id == client_session).first()
 
-        return appointment_dict, 200
+        if not client:
+            return {"error": "Client not found"}, 404
+        else:
+            appointments = [appointment.to_dict() for appointment in client.appointments]
+            return appointments, 200
+        
+    def post(self):
+
+        if 'client_id' not in session:
+            return {"error": "Log in to schedule"}, 401
+        
+        request_json = request.get_json()
+
+        date = request_json.get('date')
+        time = request_json.get('time')
+        barber_id = request_json.get('barberId')
+
+        if not barber_id:
+            return {"error": "Barber not selected"}, 400
+        
+        try:
+            new_appointment = Appointment(
+                date=date,
+                time=time,
+                client_id=session['client_id'],
+                barber_id=barber_id
+            )
+            db.session.add(new_appointment)
+            db.session.commit()
+
+            return new_appointment.to_dict(), 201
+        
+        except IntegrityError:
+            db.session.rollback()
+            return {'error': '422 Unprocessable Entity'}, 422
+        except Exception as e:
+            db.session.rollback()
+            return {"error": str(e)}, 500
+        
+class AppointmentsById(Resource):
+    def get(self, id):
+
+        appointment = Appointment.query.filter_by(id=id).first()
+
+        return appointment.to_dict(), 200
+        
+
+    def patch(self, id):
+        appointment = Appointment.query.filter(Appointment.id == id).first()
+        
+        if not appointment:
+            return {"error": "Appointment not found"}, 404
+
+        for attr in request.json:
+            setattr(appointment, attr, request.json[attr])
+
+        try:
+            db.session.add(appointment)
+            db.session.commit()
+            return appointment.to_dict(), 200
+        except Exception as e:
+            db.session.rollback()
+            return {"error": str(e)}, 500
+
+    def delete(self, id):
+        appointment = Appointment.query.filter_by(id=id).first()
+        if not appointment:
+            return {"error": "Appointment not found"}, 404
+
+        try:
+            db.session.delete(appointment)
+            db.session.commit()
+            return {"message": "Appointment successfully deleted"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"error": str(e)}, 500
         
 
 api.add_resource(Signup, '/signup', endpoint='signup')
@@ -258,6 +345,8 @@ api.add_resource(Reviews, '/reviews', endpoint='reviews')
 api.add_resource(ReviewsById, '/reviews/<int:id>')
 api.add_resource(ReviewsIndex, '/reviews_index', endpoint='reviews_index')
 api.add_resource(Appointments, '/appointments', endpoint='appointments')
+api.add_resource(AppointmentsByClient, '/my_appointments')
+api.add_resource(AppointmentsById, '/appointments/<int:id>')
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

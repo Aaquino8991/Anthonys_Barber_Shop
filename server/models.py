@@ -1,6 +1,6 @@
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_serializer import SerializerMixin
-from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy import JSON
 
 from sqlalchemy.orm import validates
 from config import db, bcrypt
@@ -16,7 +16,7 @@ class Barber(db.Model, SerializerMixin):
     reviews = db.relationship('Review', back_populates = 'barber', cascade = 'all, delete-orphan')
     appointments = db.relationship('Appointment', back_populates = 'barber', cascade = 'all, delete-orphan')
 
-    serialize_rules = ('-reviews.barber', '-appointments.barber')
+    serialize_rules = ('-reviews', '-appointments')
 
     @validates('name')
     def validates_name(self, key, name):
@@ -101,7 +101,7 @@ class Review(db.Model, SerializerMixin):
     barber = db.relationship('Barber', back_populates = 'reviews')
     client = db.relationship('Client', back_populates = 'reviews')
 
-    serialize_rules = ('-barber.reviews', '-client.reviews')
+    serialize_rules = ('-barber', '-client')
 
     @validates('title')
     def validates_title(self, key, title):
@@ -124,9 +124,8 @@ class Appointment(db.Model, SerializerMixin):
         __tablename__ = 'appointments'
 
         id = db.Column(db.Integer, primary_key=True)
-        appointment_date = db.Column(db.String, nullable=False)
-        appointment_time = db.Column(db.String, nullable=False)
-        service_type = db.Column(db.String(200))
+        date = db.Column(db.String, nullable=False)
+        time = db.Column(db.String, nullable=False)
 
         barber_id = db.Column(db.Integer, db.ForeignKey('barbers.id'))
         client_id = db.Column(db.Integer, db.ForeignKey('clients.id'))
@@ -134,7 +133,7 @@ class Appointment(db.Model, SerializerMixin):
         barber = db.relationship('Barber', back_populates = 'appointments')
         client = db.relationship('Client', back_populates = 'appointments')
 
-        serialize_rules = ('-barber.appointments', '-client.appointments')
+        serialize_rules = ('-barber', '-client')
 
         def __repr__(self):
             return f'<Appointment: {self.id} | {self.service_type}'

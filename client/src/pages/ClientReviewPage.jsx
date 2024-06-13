@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import ReviewCard from "../components/ReviewCard"
 
 const ClientReviewPage = () => {
   const navigate = useNavigate()
@@ -51,26 +52,22 @@ const ClientReviewPage = () => {
   }
 
   return (
-    <section style={{display: "flex", flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-      <h2>Hello {client.name}</h2>
+    <section>
+      <h2 className="text-center text-3xl">Hello {client.name}</h2>
       {reviews.length > 0 ? (
         <div>
-          <h2 style={{textAlign: 'center'}}>My Reviews</h2>
+          <h2 className="text-center font-bold">My Reviews</h2>
           {reviews.map((review) => (
-            <div key={review.review_id} className="review-card">
-              <h3>{review.title}</h3>
-              <p><strong>Date Posted:</strong> {review.date_posted}</p>
-              <p><strong>Rating:</strong> {review.rating}</p>
-              <p><strong>Comment:</strong> {review.comments}</p>
-              <button onClick={() => handleDelete(review.review_id)}>Delete</button>
-              <button onClick={() => navigate(`/edit-review/${review.review_id}`)}>Edit</button>
-            </div>
+            <ReviewCard 
+              key={review.review_id} 
+              review={review} 
+              handleDelete={handleDelete} />
           ))}
         </div>
       ) : (
-        <div>
-          <h3 style={{textAlign: 'center'}}>No reviews</h3>
-          <button onClick={() => navigate('/new_review')}>Write a review</button>
+        <div className="text-center">
+          <h3>No reviews</h3>
+          <button onClick={() => navigate('/new_review')} className="bg-gray-400 hover:bg-gray-500 p-2 rounded-md text-white">Write a review</button>
         </div>
       )}
 

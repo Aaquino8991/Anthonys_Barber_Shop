@@ -6,10 +6,10 @@ const Login = ({ onLogin }) => {
   const [showLogin, setShowLogin] = useState(true)
 
   return (
-    <>
+    <div>
       {showLogin ? (
         <>
-          <div className="toggle-form-btn">
+          <div className="flex flex-col items-center">
             <LoginForm onLogin={onLogin} />
             <p>Don't have an account?</p>
             <button onClick={() => setShowLogin(!showLogin)}>Sign up</button>
@@ -17,14 +17,14 @@ const Login = ({ onLogin }) => {
         </>
       ) : (
         <>
-          <div className="toggle-form-btn">
+          <div className="flex flex-col items-center">
             <SignupForm onLogin={onLogin} />
             <p>Have an account?</p>
             <button onClick={() => setShowLogin(!showLogin)}>Login</button>
           </div>
         </>
       )}
-    </>
+    </div>
   )
 }
 

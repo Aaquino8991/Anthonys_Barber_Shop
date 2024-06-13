@@ -72,11 +72,11 @@ const EditReviewPage = () => {
   });
 
   return (
-    <div>
-      <h2>Edit Review</h2>
-      <form onSubmit={formik.handleSubmit}>
+    <div className="max-w-md mx-auto bg-white p-6 rounded-md shadow-md">
+      <h2 className="text-2xl font-bold mb-4">Edit Review</h2>
+      <form onSubmit={formik.handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="title">Title:</label>
+          <label htmlFor="title" className="block text-gray-700">Title:</label>
           <input
             type="text"
             id="title"
@@ -84,13 +84,14 @@ const EditReviewPage = () => {
             value={formik.values.title}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md"
           />
-          {formik.touched.title && formik.errors.title ? (
-            <div style={{ color: 'red' }}>{formik.errors.title}</div>
-          ) : null}
+          {formik.touched.title && formik.errors.title && (
+            <div className="text-red-500">{formik.errors.title}</div>
+          )}
         </div>
         <div>
-          <label htmlFor="rating">Rating:</label>
+          <label htmlFor="rating" className="block text-gray-700">Rating:</label>
           <input
             type="number"
             id="rating"
@@ -98,35 +99,51 @@ const EditReviewPage = () => {
             value={formik.values.rating}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md"
           />
-          {formik.touched.rating && formik.errors.rating ? (
-            <div style={{ color: 'red' }}>{formik.errors.rating}</div>
-          ) : null}
+          {formik.touched.rating && formik.errors.rating && (
+            <div className="text-red-500">{formik.errors.rating}</div>
+          )}
         </div>
         <div>
-          <label htmlFor="comments">Comments:</label>
+          <label htmlFor="comments" className="block text-gray-700">Comments:</label>
           <textarea
             id="comments"
             name="comments"
             value={formik.values.comments}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md"
           />
-          {formik.touched.comments && formik.errors.comments ? (
-            <div style={{ color: 'red' }}>{formik.errors.comments}</div>
-          ) : null}
+          {formik.touched.comments && formik.errors.comments && (
+            <div className="text-red-500">{formik.errors.comments}</div>
+          )}
         </div>
-        <button type="submit">Save</button>
-        <button type="button" onClick={() => navigate(-1)}>Cancel</button>
+        <div className="flex justify-end space-x-4">
+          <button 
+            type="submit" 
+            className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition duration-200"
+          >
+            Save
+          </button>
+          <button 
+            type="button" 
+            onClick={() => navigate(-1)} 
+            className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition duration-200"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
       {errors.length > 0 && (
-        <div>
+        <div className="mt-4">
           {errors.map((error, index) => (
-            <p key={index} style={{ color: 'red' }}>{error}</p>
+            <p key={index} className="text-red-500">{error}</p>
           ))}
         </div>
       )}
     </div>
+
   );
 };
 

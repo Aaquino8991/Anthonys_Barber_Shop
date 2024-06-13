@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useFormik } from "formik"
 import * as yup from "yup"
-import { GiConsoleController } from "react-icons/gi"
 
 const NewReview = () => {
 
@@ -48,8 +47,6 @@ const NewReview = () => {
       setServerErrors([])
       setIsLoading(true)
 
-      console.log(formik.barberId)
-
       const date_posted = new Date().toISOString()
 
       fetch("/api/reviews_index", {
@@ -76,62 +73,77 @@ const NewReview = () => {
   })
 
   return (
-    <div>
-      <form onSubmit={formik.handleSubmit}>
-        <label htmlFor="title">Title:</label>
-        <input
-          type="text"
-          id="title"
-          name="title"
-          value={formik.values.title}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-        />
-        {formik.touched.title && formik.errors.title ? <p style={{ color: 'red' }}>{formik.errors.title}</p> : null}
+    <div className="flex flex-col items-center bg-white shadow-md p-8 rounded w-full max-w-md mx-auto">
+  <form onSubmit={formik.handleSubmit} className="w-full">
+    <label htmlFor="title" className="mb-2 text-gray-700">Title:</label>
+    <input
+      type="text"
+      id="title"
+      name="title"
+      value={formik.values.title}
+      onChange={formik.handleChange}
+      onBlur={formik.handleBlur}
+      className="mb-1 p-2 border border-gray-300 rounded w-full"
+    />
+    {formik.touched.title && formik.errors.title ? <p className="mb-4 text-red-500">{formik.errors.title}</p> : null}
 
-        <label htmlFor="rating">Rating:</label>
-        <input
-          type="number"
-          id="rating"
-          name="rating"
-          value={formik.values.rating}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-        />
-        {formik.touched.rating && formik.errors.rating ? <p style={{ color: 'red' }}>{formik.errors.rating}</p> : null}
+    <label htmlFor="rating" className="mb-2 text-gray-700">Rating:</label>
+    <input
+      type="number"
+      id="rating"
+      name="rating"
+      value={formik.values.rating}
+      onChange={formik.handleChange}
+      onBlur={formik.handleBlur}
+      className="mb-1 p-2 border border-gray-300 rounded w-full"
+    />
+    {formik.touched.rating && formik.errors.rating ? <p className="mb-4 text-red-500">{formik.errors.rating}</p> : null}
 
-        <label htmlFor="comments">Comments:</label>
-        <textarea
-          id="comments"
-          name="comments"
-          value={formik.values.comments}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-        />
-        {formik.touched.comments && formik.errors.comments ? <p style={{ color: 'red' }}>{formik.errors.comments}</p> : null}
+    <label htmlFor="comments" className="mb-2 text-gray-700">Comments:</label>
+    <textarea
+      id="comments"
+      name="comments"
+      value={formik.values.comments}
+      onChange={formik.handleChange}
+      onBlur={formik.handleBlur}
+      className="mb-1 p-2 border border-gray-300 rounded w-full"
+    />
+    {formik.touched.comments && formik.errors.comments ? <p className="mb-4 text-red-500">{formik.errors.comments}</p> : null}
 
-        <label htmlFor="barber">Barber:</label>
-        <select 
-          id="barberId" 
-          name="barberId" 
-          value={formik.values.barberId} 
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-        >
-          <option value="">Select a barber</option>
-          {barbers.map((barber) => (
-            <option key={barber.id} value={barber.id}>{barber.name}</option>
-          ))}
-        </select>
-        {formik.touched.barberId && formik.errors.barberId ? <p style={{ color: 'red' }}>{formik.errors.barberId}</p> : null}
+    <label htmlFor="barber" className="mb-2 text-gray-700">Barber:</label>
+    <select 
+      id="barberId" 
+      name="barberId" 
+      value={formik.values.barberId} 
+      onChange={formik.handleChange}
+      onBlur={formik.handleBlur}
+      className="mb-1 p-2 border border-gray-300 rounded w-full"
+    >
+      <option value="">Select a barber</option>
+      {barbers.map((barber) => (
+        <option key={barber.id} value={barber.id}>{barber.name}</option>
+      ))}
+    </select>
+    {formik.touched.barberId && formik.errors.barberId ? <p className="mb-4 text-red-500">{formik.errors.barberId}</p> : null}
 
-        <button type="submit">{isLoading ? "Loading..." : "Submit Review"}</button>
-        {serverErrors && <p style={{ color: 'red' }}>{serverErrors.error}</p>}
-      </form>
-      <div className="cancel-btn">        
-        <button onClick={() => navigate('/')}>Cancel</button>
-      </div>
-    </div>
+    <button 
+      type="submit" 
+      className="bg-gray-500 text-white p-2 rounded w-full hover:bg-gray-600 transition duration-200"
+    >
+      {isLoading ? "Loading..." : "Submit Review"}
+    </button>
+    {serverErrors && <p className="mt-4 text-red-500">{serverErrors.error}</p>}
+  </form>
+  <div className="mt-4 w-full">
+    <button 
+      onClick={() => navigate('/')} 
+      className="bg-gray-300 text-white p-2 rounded w-full hover:bg-gray-400 transition duration-200"
+    >
+      Cancel
+    </button>
+  </div>
+</div>
+
   )
 }
 
